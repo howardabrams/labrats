@@ -127,12 +127,14 @@
        key = $.labrats.key(arguments);
      }
 
-     // If no key was given, then we get the ID from the cookies.
-     if (key == null) {
-       key = $.labrats.getId();
+     if (key) {
+       // Convert the key into a number using a hash function:
+       return $.labrats.settings.hash(key) % numGroups;
      }
-
-     return $.labrats.settings.hash(key) % numGroups;
+     else {
+       // If no key was specified, use the random number stored in cookie
+       return $.labrats.getId() % numGroups;
+     }
    };
 
    /**
@@ -208,17 +210,6 @@
    };
 
    /**
-    * Generates a random ID value that we can use for a user identification.
-    * Note: This is not RFC4122 compliant, as I don't think that is necessary.
-    */
-   function makeUUID() {
-     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-       var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
-       return v.toString(16);
-     });
-   }
-
-   /**
     * Sets a particular cookie with a given key and value. Both values
     * will be escaped.
     */
@@ -239,17 +230,18 @@
    /**
     * Returns an unique identification for the current user's browser.
     * If this is the first time a user has seen the application, we
-    * generate a new ID, otherwise, we return the ID stored in a cookie.
+    * generate a new ID (as a random number), otherwise, we return the
+    * ID stored in a cookie.
     */
 
    $.labrats.getId = function() {
      var label = 'labrats_userID',
             id = getCookie(label);
      if (id == null) {
-       id = makeUUID();
+       id = Math.floor( Math.random() * 100000000 ).toString();
        setCookie(label, id);
      }
-     return id;
+     return parseInt(id);
    };
 
    /**
@@ -267,7 +259,7 @@
        for(c in key) {
          results += ( key.charCodeAt(c) << c);
        }
-       console.log("Key:", key, "Hash:", results);
+       // console.log("Key:", key, "Hash:", results);
        return Math.abs(results);
      }
    };
