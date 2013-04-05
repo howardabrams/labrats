@@ -172,15 +172,41 @@ test("split test of a basic 50/50 test using ordered parameters", function() {
           "f3", "Expected f3 to be called.");
 });
 
-test("split test with insufficient callbacks", function() {
-    $.labrats.configure( { numGroups: 3 } );
+test("split test without specifying numGroups", function() {
+    // Clear out any numGroup setting
+    delete($.labrats.settings.numGroups);
 
     var f1 = function() {
         return "f1";
     };
+    var f2 = function() {
+        return "f2";
+    };
+    var f3 = function() {
+        return "f3";
+    };
 
-    throws( function() { $.labrats(id1, f1); },
-            "No function should be called.");
+    equal($.labrats(id1, f1, f2, f3),
+          "f2", "Expected f2 to be called.");
+
+    equal($.labrats(id2, "Some Test", f1, f2, f3),
+          "f3", "Expected f3 to be called.");
+});
+
+
+test("split test with unmatched callbacks and numGroups", function() {
+    // Set the number of groups to an incorrect number
+    $.labrats.configure( { numGroups: 30 } );
+
+    var f1 = function() {
+        return "f1";
+    };
+    var f2 = function() {
+        return "f2";
+    };
+
+    equal($.labrats(id1, f1, f2),
+          "f2", "Expected f2 to be called.");
 });
 
 test("split test from a jQuery selector chain", function() {
@@ -199,6 +225,10 @@ test("split test from a jQuery selector chain", function() {
 
     equal(element, "fn2", "Expected f2 to be called.");
 });
+
+/**
+ * getID()
+ */
 
 test("getID should return the same value repeatedly.", function() {
     // JavaScript doesn't allow setting/reading cookies if the file

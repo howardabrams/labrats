@@ -18,7 +18,7 @@
     * For instance, for a test that splits the user accounts into three
     * groups, you could do:
     *
-    *     $.labrats.configure( { numGroups: 3 } );
+    *     $.labrats.configure( { numGroups: 3 } ); // Optional
     *     $.labrats(userid, "Some Test", fn1, fn2, fn3);
     *
     * The other approach to calling this function is with named parameters.
@@ -33,6 +33,9 @@
 
    $.labrats = function(params) {
      if (typeof params === 'object') {
+       // The number of groups should be the number of callbacks
+       $.labrats.settings.numGroups = params.callbacks.length;
+
        var groupnum = $.labrats.group(params);
        return params.callbacks[groupnum].apply(this, [groupnum]);
      }
@@ -48,6 +51,9 @@
            keys.push (arguments[i]);
          }
        }
+
+       // The number of groups should be the number of callbacks
+       $.labrats.settings.numGroups = funcs.length;
 
        var groupnum = $.labrats.group(keys);
        if (funcs[groupnum]) {
