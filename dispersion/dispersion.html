@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Lab Rats Dispersion Rates</title>
+    <style type="text/css">
+      body {
+         color: #666;
+         padding: 20px;
+         font-family: sans-serif;
+      }
+      p {
+         width: 800px;
+      }
+      h2 {
+         padding-top: 20px;
+         clear: both;
+      }
+      .results {
+         color: white;
+         background-color: #008;
+         border: 1px solid #fff;
+         float: left;
+         padding-left: 8px;
+      }
+      .label {
+         clear: both; 
+         float: left;
+         padding-right: 12px;
+      }
+    </style>
+    <script src="http://code.jquery.com/jquery-1.9.1.min.js" type="text/javascript"></script>
+    <script src="../jquery.labrats.js"></script>
+    <script src="dispersion.js"></script>
+  </head>
+  <body>
+    <h1>Distribution Experiments</h1>
+    <p>
+      If you don't let the <code>labrats</code> plugin calculate and
+      distribute your user's into test buckets (by <b>not</b>
+      specifying a <code>key</code>), then you need a good hashing function to
+      convert your "id" into a number.
+    </p>
+    <p>
+      The one built into the plugin is pretty simplistic, and the
+      first two experiments demonstrate this. The second uses the
+      <a href="http://en.wikipedia.org/wiki/MurmurHash">Murmur Hash
+      algorithm</a>, and as you can see, is a bit better at
+      distributing GUIDs into test buckets.
+    </p>
+
+    <div id="experiment1">
+      <h2>Experiment 1</h2>
+      <p>
+        The following uses the built-in hash routine (which is pretty
+        stupid), and splits 1,000 generated GUIDs between two groups:
+      </p>
+    </div>
+
+    <div id="experiment2">
+      <h2>Experiment 2</h2>
+      <p>
+        The following uses the built-in hash routine, but splits
+        10,000 generated GUIDs between ten groups:
+      </p>
+    </div>
+
+    <div id="experiment3">
+      <h2>Experiment 3</h2>
+      <p>
+        The following uses an Murmur hash routine with 1,000 generated
+        GUIDs split between two groups:
+      </p>
+    </div>
+
+    <div id="experiment4">
+      <h2>Experiment 4</h2>
+      <p>
+        This uses Murmur hash routine, but splits 10,000 generated
+        GUIDs between ten groups:
+      </p>
+    </div>
+
+  </body>
+</html>
