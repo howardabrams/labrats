@@ -121,6 +121,11 @@
        key = $.labrats.key(arguments);
      }
 
+     // If no key was given, then we get the ID from the cookies.
+     if (key == null) {
+       key = $.labrats.getId();
+     }
+
      return $.labrats.settings.hash(key) % numGroups;
    };
 
@@ -194,6 +199,51 @@
        }
      }
      return key;
+   };
+
+   /**
+    * Generates a random ID value that we can use for a user identification.
+    * Note: This is not RFC4122 compliant, as I don't think that is necessary.
+    */
+   function makeUUID() {
+     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+       var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+       return v.toString(16);
+     });
+   }
+
+   /**
+    * Sets a particular cookie with a given key and value. Both values
+    * will be escaped.
+    */
+   function setCookie(key,value) {
+     document.cookie = escape(key) + "=" + escape(value);
+   }
+
+   /**
+    * Simple function for retrieving a particular cookie by its key.
+    * If the cookie has not be set, then this returns null.
+    */
+   function getCookie(key) {
+     return unescape(document.cookie.replace(new RegExp("(?:(?:^|.*;\\s*)" +
+                                                        escape(key).replace(/[\-\.\+\*]/g, "\\$&") +
+                                                        "\\s*\\=\\s*((?:[^;](?!;))*[^;]?).*)|.*"), "$1")) || null;
+   }
+
+   /**
+    * Returns an unique identification for the current user's browser.
+    * If this is the first time a user has seen the application, we
+    * generate a new ID, otherwise, we return the ID stored in a cookie.
+    */
+
+   $.labrats.getId = function() {
+     var label = 'labrats_userID',
+            id = getCookie(label);
+     if (id == null) {
+       id = makeUUID();
+       setCookie(label, id);
+     }
+     return id;
    };
 
    /**

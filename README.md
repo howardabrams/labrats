@@ -13,11 +13,6 @@ This experiment will split your visitors into two equal
 be shown the Flashy Blue button. We call this test, the **Big Button**
 experiment.
 
-Let's assume that you can identify each person and store a unique ID
-in a JavaScript variable:
-
-    var guid = 'bcfb3529-0fed-4b05-8414-db3e1d2b11da';
-
 Taking advantage of the `labrats` plugin is a simple two step process:
 
 ### Step 1. Create a Function for each Group
@@ -33,21 +28,22 @@ page slightly differently:
         $('#big-button').addClass('flashy-blue');
     }
 
-Normally, you would put an element to report why element is shown to
-the user, but we'll get to that in a minute.
+Normally, you would put an element to report which element is shown to
+which user, but we'll get to that in a minute.
 
 ### Step 2. Call the Function for Test Subject
 
 The final step amounts to having the `labrats()` function call one of the
 callback functions for each user based on their group.
 
-    $.labrats( { key: guid, name: 'Big Button', numGroups: 2,
+    $.labrats( { name: 'Big Button', numGroups: 2,
                  callbacks: [ shinyRed, flashyBlue ] } );
 
 That is all that is needed to get a barebones test showing different
 button styles to different users.
 
-### Reporting
+Reporting
+---------
 
 Of course, a multivariate test is not really an experiement without
 the scientific principles of observations and reporting.
@@ -71,3 +67,17 @@ Now, we just need to change our functions a wee bit:
             tracking('clicked', 'flashy-blue, guid);
         });
     }
+
+On Identifying Users
+-------------
+
+The plugin keeps track of a user account by storing a unique ID in the
+browser's stash of cookies, however, you can specify the ID you want
+it to use. For instance, assuming that you had a `guid` variable like:
+
+    var guid = 'bcfb3529-0fed-4b05-8414-db3e1d2b11da';
+
+You can pass in this as a `key` to the `$.labrats()` function:
+
+    $.labrats( { key: guid, name: 'Big Button', numGroups: 2,
+                 callbacks: [ shinyRed, flashyBlue ] } );

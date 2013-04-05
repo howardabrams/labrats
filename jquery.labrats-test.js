@@ -199,3 +199,48 @@ test("split test from a jQuery selector chain", function() {
 
     equal(element, "fn2", "Expected f2 to be called.");
 });
+
+test("getID should return the same value repeatedly.", function() {
+    // JavaScript doesn't allow setting/reading cookies if the file
+    // is from the local file system, so if we can ignore this test
+    // if we can't set cookies ...
+
+    if (cookiesAllowed()) {
+      var label = "labrats_userID";
+      document.cookie = label + "=";   // Clear cookie
+
+      var id1 = $.labrats.getId();
+      var id2 = $.labrats.getId();
+
+      equal(id2, id1, "Expected to get the same ID when called twice.");
+    }
+});
+
+test("group should use a default key if one isn't given", function() {
+    if (cookiesAllowed()) {
+      var group = $.labrats.group( { numGroups:2 } );
+      equal($.labrats.group( { numGroups:2 } ), group,
+          "Expected to be in sixth (5) group");
+    }
+});
+
+test("group given no parameters should still work", function() {
+  if (cookiesAllowed()) {
+    $.labrats.configure( { numGroups:3 } );
+    var group = $.labrats.group();
+    equal($.labrats.group(), group,
+          "Expected to be in sixth (5) group");
+  }
+});
+
+
+function cookiesAllowed() {
+  document.cookie = "foo=bar";
+  if (document.cookie == '') {
+    ok(true);
+    return false;
+  }
+  else {
+    return true;
+  }
+}
