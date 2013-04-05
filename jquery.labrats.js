@@ -32,11 +32,18 @@
     */
 
    $.labrats = function(params) {
+     // Save off the original numgroups setting...
+     var origNumGroups = $.labrats.settings.numGroups;
+
      if (typeof params === 'object') {
        // The number of groups should be the number of callbacks
        $.labrats.settings.numGroups = params.callbacks.length;
 
+       // Use the new numGroup setting:
        var groupnum = $.labrats.group(params);
+
+       $.labrats.settings.numGroups = origNumGroups;
+
        return params.callbacks[groupnum].apply(this, [groupnum]);
      }
      else {
@@ -56,6 +63,9 @@
        $.labrats.settings.numGroups = funcs.length;
 
        var groupnum = $.labrats.group(keys);
+
+       $.labrats.settings.numGroups = origNumGroups;
+
        if (funcs[groupnum]) {
          return funcs[groupnum].apply(this, [groupnum]);
        }
