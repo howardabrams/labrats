@@ -109,16 +109,28 @@ test( "Group settings with named parameters and settings", function() {
           "Expected to be in sixth (5) group");
 });
 
+test( "Group settings outside a control group", function() {
+    equal($.labrats.group( { key: id2, name: "Some Test",
+                             numGroups: 2, subset: 50 }), 1,
+          "Expected to be in the control group");
+});
+
+test( "Group settings within a control group", function() {
+    equal($.labrats.group( { key: id1, name: "Another Test",
+                             numGroups: 2, subset: 50 }), -1,
+          "Expected to be in the control group");
+});
+
 /**
  * inGroup()
  */
 
 test( "inGroup with named parameters", function() {
 
-  ok( $.labrats.inGroup({groupnum: 1, key: id2, numGroups: 2}),
+  ok( $.labrats.inGroup(1, {key: id2, numGroups: 2}),
       "Expected to be in second group");
-  ok( $.labrats.inGroup({groupnum: 1, key: id2, name: 'Some Test',
-                         numGroups: 2}),
+  ok( $.labrats.inGroup(1, {key: id2, name: 'Some Test',
+                            numGroups: 2}),
       "Expected to be in second group");
 });
 
@@ -149,6 +161,29 @@ test("split test of a basic 50/50 test", function() {
         $.labrats({ key: id2, name: "Some Test", numGroups:2,
                           callbacks: [ f1, f2 ] }),
         "f2", "Expected f2 to be called.");
+});
+
+test("split test of a basic 50/50 test but only 10% pool", function() {
+
+    var fn1 = function() {
+        return "fn1";
+    };
+    var fn2 = function() {
+        return "fn2";
+    };
+    var fn3 = function() {
+        return "fn3";
+    };
+
+    equal(
+      $.labrats({ key: id1, subset: 10, control: fn3,
+                  callbacks: [ fn1, fn2 ] }),
+      "fn3", "Expected the control fn to be called.");
+
+    equal(
+      $.labrats({ key: id2, name: "Some Test", subset: 50,
+                    callbacks: [ fn1, fn2 ],       control: fn3 }),
+      "fn2", "Expected fn2 to be called.");
 });
 
 test("split test of a basic 50/50 test using ordered parameters", function() {
@@ -225,6 +260,7 @@ test("split test from a jQuery selector chain", function() {
 
     equal(element, "fn2", "Expected f2 to be called.");
 });
+
 
 /**
  * getID()

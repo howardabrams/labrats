@@ -29,6 +29,18 @@
     *
     * This function returns the results of calling one of the callback
     * functions.
+    *
+    * Note: The size of available pool for tests can be limited (effectively
+    * creating a a pool of people in test groups and another control
+    * group).  For instance:
+    *
+    *    $.labrats.group( { key: userId, name: "Another Test", subset: 10,
+    *                       callbacks: [ fn1, fn2, fn3 ],
+    *                       control: fn4 });
+    *
+    * Will call the `control` function if the user is part of the 90%
+    * control group, otherwise, it calls the appropriate function in
+    * the `callbacks` array.
     */
 
    $.labrats = function(params) {
@@ -44,7 +56,12 @@
 
        $.labrats.settings.numGroups = origNumGroups;
 
-       return params.callbacks[groupnum].apply(this, [groupnum]);
+       if (groupnum == -1) {    // User is part of the control group
+         return params.control.apply(this, [groupnum]);
+       }
+       else {
+         return params.callbacks[groupnum].apply(this, [groupnum]);
+       }
      }
      else {
        var keys  = [];
@@ -120,30 +137,56 @@
     *
     * NB: This last approach allows you to specify the number of
     * groups (instead of calling the `configure()` function.
+    *
+    * You can limit the size of available pool (effectively creating a
+    * a pool of people in test groups and another control group).  For
+    * instance:
+    *
+    *    $.labrats.group( { key: userId, name: "Another Test",
+    *                       numGroups: 2, subset: 10 });
+    *
+    * Will return -1 if the user is part of the 90% control group,
+    * otherwise, it returns either `0` or `1` if it is in one of the
+    * test groups.
     */
 
    $.labrats.group = function(params) {
-     var key;
-     var numGroups = $.labrats.settings.numGroups;
+     var key, controlValue,
+         numGroups = $.labrats.settings.numGroups,
+         subset = 100;
 
      if ($.isArray(params)) {
        key = $.labrats.key(params);
      }
      else if (typeof params === 'object') {
-       key = $.labrats.key(params.key, params.name);
+       if (params.key) {
+         key = params.key + params.name;
+       }
+       else {
+         key = $.labrats.getId() + params.name;
+       }
        numGroups = params.numGroups || numGroups;
+
+       if (params.subset) {
+         subset = params.subset;
+         controlValue =
+           $.labrats.settings.hash(params.name || "default-test-group") % 100;
+       }
      }
      else {
        key = $.labrats.key(arguments);
      }
 
-     if (key) {
-       // Convert the key into a number using a hash function:
-       return $.labrats.settings.hash(key) % numGroups;
+     if (!key) {
+       // Still no key? Use random number stored in cookie
+       key = $.labrats.getId();
+     }
+
+     if (controlValue && controlValue > subset) {
+       return -1;  // In the control group...
      }
      else {
-       // If no key was specified, use the random number stored in cookie
-       return $.labrats.getId() % numGroups;
+       return $.labrats.settings.hash(key) % numGroups;
      }
    };
 
@@ -153,11 +196,12 @@
     * otherwise.
     * This function can be called either with named parameters, as in:
     *
-    *     $.labrats.inGroup( { groupnum: 2, key: userid, name: testname }
+    *     $.labrats.inGroup( 2, { key: userid, name: testname }
     *
-    * Where:
+    * Where the first argument is the group number to check, and the
+    * second argument is an object similar to what is passed to the
+    * `$.labrats.group()` function, including:
     *
-    *   - `groupnum` is the 0-based group number
     *   - `key` is the identification of the user
     *   - `name` is the test's name (optional)
     *
@@ -166,9 +210,9 @@
     *     $.labrats.inGroup( 2, userid, testname )
     */
 
-   $.labrats.inGroup = function(opts) {
+   $.labrats.inGroup = function(groupnum, opts) {
      if (typeof opts === 'object') {
-       return $.labrats.group(opts) === opts.groupnum;
+       return $.labrats.group(opts) === groupnum;
      }
      else {
        var args = Array.prototype.slice.call(arguments);
@@ -251,7 +295,7 @@
        id = Math.floor( Math.random() * 100000000 ).toString();
        setCookie(label, id);
      }
-     return parseInt(id);
+     return id;
    };
 
    /**
