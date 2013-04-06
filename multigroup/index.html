@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Lab Rats Multi-Group Dispersion Rates</title>
+    <style type="text/css">
+      body {
+         color: #666;
+         padding: 20px;
+         font-family: sans-serif;
+      }
+      p {
+         width: 800px;
+      }
+      h2 {
+         padding-top: 20px;
+         clear: both;
+      }
+      .results {
+         color: white;
+         background-color: #008;
+         border-bottom: 1px solid #fff;
+         float: left;
+         padding-left: 8px;
+      }
+      .groupA {
+         background-color: #008;
+      }
+      .groupB {
+         background-color: #080;
+      }
+      .control {
+         background-color: #800;
+      }
+      .label {
+         clear: both; 
+         float: left;
+         padding-right: 12px;
+         width: 100px;
+      }
+    </style>
+    <script src="http://code.jquery.com/jquery-1.9.1.min.js" type="text/javascript"></script>
+    <script src="../jquery.labrats.js"></script>
+    <script src="multigroup.js"></script>
+  </head>
+  <body>
+    <h1>Multigroup Distribution Experiments</h1>
+    <p>
+      What if you are running concurrent tests? How many people will
+      end up being a test subject for more than one experiment?
+      This example attempts to show this sort of re-distribution.
+    </p>
+    <p>
+      First step is to create 1,000 user account identifiers
+      (generated GUIDs), and then ...
+    </p>
+
+    <div id="experiment1">
+      <h2>First Test</h2>
+      <p>
+        Next, we simply divide them into two test groups plus a
+        control group:
+      </p>
+      <div class="label">Group A</div>
+      <div class="groupA group1A results"></div>
+      <div class="label">Group B</div>
+      <div class="groupB group1B results"></div>
+      <div class="label">Control</div>
+      <div class="control group1C results"></div>
+    </div>
+
+    <div id="experiment1">
+      <h2>Second Test</h2>
+      <p>
+        Finally, we take those same 1,000 users, but re-distribute them
+        in a similar sized, but different test. The colors below
+        matches the colors in the first test above.
+      </p>
+      <div class="label">Group A</div>
+      <div class="groupA group2AA results"></div>
+      <div class="groupB group2AB results"></div>
+      <div class="control group2AC results"></div>
+
+      <div class="label">Group B</div>
+      <div class="groupA group2BA results"></div>
+      <div class="groupB group2BB results"></div>
+      <div class="control group2BC results"></div>
+
+      <div class="label">Control</div>
+      <div class="groupA group2CA results"></div>
+      <div class="groupB group2CB results"></div>
+      <div class="control group2CC results"></div>
+    </div>
+
+  </body>
+</html>
