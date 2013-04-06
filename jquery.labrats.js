@@ -170,7 +170,7 @@
        if (params.subset) {
          subset = params.subset;
          controlValue =
-           $.labrats.settings.hash(params.name || "default-test-group") % 100;
+           $.labrats.settings.hash(key) % 100;
        }
      }
      else {
