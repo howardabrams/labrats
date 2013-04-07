@@ -94,10 +94,8 @@
 
    /**
     * Behaves like the utility function, `$.labrats()`, but the callback
-    * function is given the jQuery selector results so that the callback
-    * function can behave as part of a jQuery chain.
-    *
-    * For instance:
+    * function is given the jQuery selector results. This allows the callback
+    * function to behave as part of a jQuery chain. For instance:
     *
     *     function fn1() {
     *        return this.addClass("shiny-red");
@@ -106,10 +104,10 @@
     *        return this.addClass("flashy-blue");
     *     };
     *
-    *     var params = { key: id1, callbacks: [ fn1, fn2 ] };
-    *     $("#logo-test").labrats(params).click(...);
+    *     var testCfg = { key: id1, callbacks: [ fn1, fn2 ] };
+    *     $("#logo-test").labrats(testCfg).click(...);
     *
-    * Note: Only *named parameters* work as arguments to this.
+    * **Note:** Only *named parameters* work as arguments.
     */
 
    $.fn.labrats = function(params) {
@@ -117,9 +115,9 @@
    };
 
    /**
-    * Determines the "group number" a given user is in. The number
-    * of groups is specified using the `configure()` function.
-    * The user's `key` is passed in as the parameter, but this can
+    * Determines the *group number* assigned to a given user. The number
+    * of groups can be specified using the `configure()` function (see below).
+    * The user's `key` is passed in as the parameter, but this should
     * also take the name of the test as well.
     *
     * This can either be specified as parameters, as in:
@@ -135,8 +133,8 @@
     *     $.labrats.group( { key: userID, name: "Large Logo Test",
     *                        numGroups: 2 } );
     *
-    * NB: This last approach allows you to specify the number of
-    * groups (instead of calling the `configure()` function.
+    * **Note:** This last approach allows you to specify the number of
+    * groups (instead of calling the `configure()` function).
     *
     * You can limit the size of available pool (effectively creating a
     * a pool of people in test groups and another control group).  For
@@ -147,7 +145,7 @@
     *
     * Will return -1 if the user is part of the 90% control group,
     * otherwise, it returns either `0` or `1` if it is in one of the
-    * test groups.
+    * 5% sized test groups.
     */
 
    $.labrats.group = function(params) {
@@ -194,6 +192,7 @@
     * A test to see if a particular 'key' is part of the given group.
     * Returns `true` if a given key is in the group number, `false`
     * otherwise.
+    *
     * This function can be called either with named parameters, as in:
     *
     *     $.labrats.inGroup( 2, { key: userid, name: testname }
@@ -203,7 +202,8 @@
     * `$.labrats.group()` function, including:
     *
     *   - `key` is the identification of the user
-    *   - `name` is the test's name (optional)
+    *   - `name` is the test's name
+    *   - `subset` is the size of the pool, where `100 - subset` is the size of the control group
     *
     * This function can also be called as a series of parameters:
     *
@@ -222,15 +222,18 @@
    };
 
    /**
-    * Converts a series of arguments into a "key" to use for a
-    * hash. Each function may call this using various formats.
-    * For instance, as a bunch of strings:
-    *     var key = $.labrats.key("some", "key", id);
+    * Converts a series of arguments into a *key* to use in a
+    * hash. Each function may call this using a few formats.
+    * For instance, as a series of string arguments:
+    *
+    *     var key = $.labrats.key("test", "abc", id);
     *
     * or as an array:
-    *     var key = $.labrats.key(["some", "key", id]);
     *
-    * or even as the 'function' arguments...
+    *     var key = $.labrats.key([id, "test", "abc"]);
+    *
+    * or even as the function's arguments:
+    *
     *     var key = $.labrats.key(arguments);
     */
 
@@ -267,6 +270,7 @@
     * Sets a particular cookie with a given key and value. Both values
     * will be escaped.
     */
+
    function setCookie(key,value) {
      document.cookie = escape(key) + "=" + escape(value);
    }
@@ -275,6 +279,7 @@
     * Simple function for retrieving a particular cookie by its key.
     * If the cookie has not be set, then this returns null.
     */
+
    function getCookie(key) {
      return unescape(document.cookie.replace(new RegExp("(?:(?:^|.*;\\s*)" +
                                                         escape(key).replace(/[\-\.\+\*]/g, "\\$&") +
@@ -320,7 +325,10 @@
 
    /**
     * This function allows a single object to overwrite some, but not
-    * all configuration values.
+    * all configuration values. Acceptable values include:
+    *
+    *  - `hash`: A function used to convert a user ID key and test name into a number
+    *  - `numGroups`: The number of test groups to divide the user pool
     */
 
    $.labrats.configure = function(config) {
