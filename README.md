@@ -114,6 +114,26 @@ It seems the [MurmurHash][4] is quite good at distribution, and
   [4]: http://en.wikipedia.org/wiki/MurmurHash
   [5]: dispersion/dispersion.html
 
+On Distribution for Multiple Tests
+------------------
+
+Since this plugin distributes user accounts among test groups randomly,
+if you run more than one test, some user accounts will be in mutiple test groups.
+For example, the following experiment has assigns 25% of the users into "Group A" and 25% into "Group B".
+This leaves 50% of the users outside of this test in a control group:
+
+![Distribution for Test 1](multigroup/graph-1.png)
+
+Using the same users but with a *second experiment* of exactly the same size, some of the user accounts
+from the first "Group A" will be in this second "Group A" as well as some in "Group B", as shown in this
+image. The colors are based on the assignments in the first experiment above:
+
+![Distribution for Test 2](multigroup/graph-2.png)
+
+If the second experiment should only use accounts from the first experiments *control group*, then this
+plugin is not what you should use, but instead, you'll need to create a distribution based on your
+knowledge of your user accounts.
+
 Function API
 ------------------
 
