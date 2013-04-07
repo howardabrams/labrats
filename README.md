@@ -121,7 +121,7 @@ The following details the available functions. While the primary
 function is `$.labrats()`, fine-grain control may be had with the
 other functions described below.
 
-### $.labrats
+### `$.labrats()`
 
 Calls a function based on an assigned test group for a user.
 The identification key for the user (as well as the name(s) of
@@ -156,7 +156,7 @@ control group, otherwise, it calls the appropriate function in
 the `callbacks` array.
 
 
-### $.fn.labrats
+### `$.fn.labrats()`
 
 Behaves like the utility function, `$.labrats()`, but the callback
 function is given the jQuery selector results. This allows the callback
@@ -175,7 +175,7 @@ function to behave as part of a jQuery chain. For instance:
 **Note:** Only *named parameters* work as arguments.
 
 
-### $.labrats.group
+### `$.labrats.group()`
 
 Determines the *group number* assigned to a given user. The number
 of groups can be specified using the `configure()` function (see below).
@@ -199,18 +199,18 @@ Or as a collection of named parameters:
 groups (instead of calling the `configure()` function).
 
 You can limit the size of available pool (effectively creating a
-a pool of people in test groups and another control group).  For
+a pool of people in test groups and another *control group*).  For
 instance:
 
-   $.labrats.group( { key: userId, name: "Another Test",
-                      numGroups: 2, subset: 10 });
+    $.labrats.group( { key: userId, name: "Another Test",
+                       numGroups: 2, subset: 10 });
 
-Will return -1 if the user is part of the 90% control group,
+Will return `-1` if the user is part of the 90% control group,
 otherwise, it returns either `0` or `1` if it is in one of the
 5% sized test groups.
 
 
-### $.labrats.inGroup
+### `$.labrats.inGroup()`
 
 A test to see if a particular 'key' is part of the given group.
 Returns `true` if a given key is in the group number, `false`
@@ -233,7 +233,7 @@ This function can also be called as a series of parameters:
     $.labrats.inGroup( 2, userid, testname )
 
 
-### $.labrats.key
+### `$.labrats.key()`
 
 Converts a series of arguments into a *key* to use in a
 hash. Each function may call this using a few formats.
@@ -250,7 +250,7 @@ or even as the function's arguments:
     var key = $.labrats.key(arguments);
 
 
-### $.labrats.getId
+### `$.labrats.getId()`
 
 Returns an unique identification for the current user's browser.
 If this is the first time a user has seen the application, we
@@ -258,7 +258,7 @@ generate a new ID (as a random number), otherwise, we return the
 ID stored in a cookie.
 
 
-### $.labrats.configure
+### `$.labrats.configure()`
 
 This function allows a single object to overwrite some, but not
 all configuration values. Acceptable values include:

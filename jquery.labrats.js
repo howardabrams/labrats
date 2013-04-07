@@ -137,13 +137,13 @@
     * groups (instead of calling the `configure()` function).
     *
     * You can limit the size of available pool (effectively creating a
-    * a pool of people in test groups and another control group).  For
+    * a pool of people in test groups and another *control group*).  For
     * instance:
     *
-    *    $.labrats.group( { key: userId, name: "Another Test",
-    *                       numGroups: 2, subset: 10 });
+    *     $.labrats.group( { key: userId, name: "Another Test",
+    *                        numGroups: 2, subset: 10 });
     *
-    * Will return -1 if the user is part of the 90% control group,
+    * Will return `-1` if the user is part of the 90% control group,
     * otherwise, it returns either `0` or `1` if it is in one of the
     * 5% sized test groups.
     */
