@@ -62,9 +62,9 @@ Now, we just need to change our functions a wee bit:
     }
 
     function flashyBlue() {
-        tracking('shown', 'flashy-blue, guid);
+        tracking('shown', 'flashy-blue', guid);
         $('#big-button').addClass('flashy-blue').click( function(){
-            tracking('clicked', 'flashy-blue, guid);
+            tracking('clicked', 'flashy-blue', guid);
         });
     }
 
