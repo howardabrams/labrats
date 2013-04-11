@@ -156,14 +156,14 @@
     * divides the test pool into discreet subgroups, and the `slice` option
     * specifies which slice to use for a particular test.
     *
-    * For instance, suppose you have three tests that are quite invasive,
-    * and perhaps even conflicting if a person ended up in the "Group A"
-    * for more than one. We could define the first test as:
+    * For instance, suppose you have some experiments that are quite invasive,
+    * (perhaps even conflicting if a person ended up as a lab rat in more than one),
+    * we could define the first experiment to use the first slice:
     *
     *     $.labrats.group( { key: userId, name: "serious tests",
     *                        slices: 3, slice: 0, numGroups: 2 });
     *
-    * The second test would be:
+    * The second experiment would use the next *slice*:
     *
     *     $.labrats.group( { key: userId, name: "serious tests",
     *                        slices: 3, slice: 1, numGroups: 2 });
@@ -174,6 +174,12 @@
     * keep a control group out. Also, when using the subset and the slicing
     * features, the `numGroups` option can be unspecified in order to default
     * to `1` (a single test group).
+    *
+    * With five experiments where each experiment is in a slice with
+    * two test groups, we might have a distribution illustrated in
+    * this diagram:
+    *
+    * ![Distribution for Test 1](visuals/slice_graph.png)
     */
 
    $.labrats.group = function(params) {

@@ -122,13 +122,13 @@ if you run more than one test, some user accounts will be in mutiple test groups
 For example, the following experiment has assigns 25% of the users into "Group A" and 25% into "Group B".
 This leaves 50% of the users outside of this test in a control group:
 
-![Distribution for Test 1](multigroup/graph-1.png)
+![Distribution for Test 1](visuals/graph-1.png)
 
 Using the same users but with a *second experiment* of exactly the same size, some of the user accounts
 from the first "Group A" will be in this second "Group A" as well as some in "Group B", as shown in this
 image. The colors are based on the assignments in the first experiment above:
 
-![Distribution for Test 2](multigroup/graph-2.png)
+![Distribution for Test 2](visuals/graph-2.png)
 
 If the second experiment should only use accounts from the first experiments *control group*, then this
 plugin is not what you should use, but instead, you'll need to create a distribution based on your
@@ -215,8 +215,10 @@ Or as a collection of named parameters:
     $.labrats.group( { key: userID, name: "Large Logo Test",
                        numGroups: 2 } );
 
-**Note:** This last approach allows you to specify the number of
+This last approach allows you to specify the number of
 groups (instead of calling the `configure()` function).
+
+#### Limit Test Pool with `subset`
 
 You can limit the size of available pool (effectively creating a
 a pool of people in test groups and another *control group*).  For
@@ -228,6 +230,38 @@ instance:
 Will return `-1` if the user is part of the 90% control group,
 otherwise, it returns either `0` or `1` if it is in one of the
 5% sized test groups.
+
+#### Slicing Test Pool
+
+With multiple tests, a random distribution algorithm means that some
+users will end up in more than one test group. The `slices` option
+divides the test pool into discreet subgroups, and the `slice` option
+specifies which slice to use for a particular test.
+
+For instance, suppose you have some experiments that are quite invasive,
+(perhaps even conflicting if a person ended up as a lab rat in more than one),
+we could define the first experiment to use the first slice:
+
+    $.labrats.group( { key: userId, name: "serious tests",
+                       slices: 3, slice: 0, numGroups: 2 });
+
+The second experiment would use the next *slice*:
+
+    $.labrats.group( { key: userId, name: "serious tests",
+                       slices: 3, slice: 1, numGroups: 2 });
+
+Notice the test name for the group of slices must be the same.
+
+This slicing feature can be combined with the `subset` feature to
+keep a control group out. Also, when using the subset and the slicing
+features, the `numGroups` option can be unspecified in order to default
+to `1` (a single test group).
+
+With five experiments where each experiment is in a slice with
+two test groups, we might have a distribution illustrated in
+this diagram:
+
+![Distribution for Test 1](visuals/slice_graph.png)
 
 
 ### `$.labrats.inGroup()`
@@ -246,7 +280,8 @@ second argument is an object similar to what is passed to the
 
   - `key` is the identification of the user
   - `name` is the test's name
-  - `subset` is the size of the pool, where `100 - subset` is the size of the control group
+  - `subset` is the size of the pool, where `100 - subset` is the
+     size of the control group
 
 This function can also be called as a series of parameters:
 
