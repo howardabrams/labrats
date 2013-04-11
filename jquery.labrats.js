@@ -133,8 +133,10 @@
     *     $.labrats.group( { key: userID, name: "Large Logo Test",
     *                        numGroups: 2 } );
     *
-    * **Note:** This last approach allows you to specify the number of
+    * This last approach allows you to specify the number of
     * groups (instead of calling the `configure()` function).
+    *
+    * #### Limit Test Pool with `subset`
     *
     * You can limit the size of available pool (effectively creating a
     * a pool of people in test groups and another *control group*).  For
@@ -146,15 +148,43 @@
     * Will return `-1` if the user is part of the 90% control group,
     * otherwise, it returns either `0` or `1` if it is in one of the
     * 5% sized test groups.
+    *
+    * #### Slicing Test Pool
+    *
+    * With multiple tests, a random distribution algorithm means that some
+    * users will end up in more than one test group. The `slices` option
+    * divides the test pool into discreet subgroups, and the `slice` option
+    * specifies which slice to use for a particular test.
+    *
+    * For instance, suppose you have three tests that are quite invasive,
+    * and perhaps even conflicting if a person ended up in the "Group A"
+    * for more than one. We could define the first test as:
+    *
+    *     $.labrats.group( { key: userId, name: "serious tests",
+    *                        slices: 3, slice: 0, numGroups: 2 });
+    *
+    * The second test would be:
+    *
+    *     $.labrats.group( { key: userId, name: "serious tests",
+    *                        slices: 3, slice: 1, numGroups: 2 });
+    *
+    * Notice the test name for the group of slices must be the same.
+    *
+    * This slicing feature can be combined with the `subset` feature to
+    * keep a control group out. Also, when using the subset and the slicing
+    * features, the `numGroups` option can be unspecified in order to default
+    * to `1` (a single test group).
     */
 
    $.labrats.group = function(params) {
      var key, controlValue,
          numGroups = $.labrats.settings.numGroups,
-         subset = 100;
+         slices, slice, subset = 100,
+         keyValue;
 
      if ($.isArray(params)) {
        key = $.labrats.key(params);
+       keyValue = parseInt($.labrats.settings.hash(key));
      }
      else if (typeof params === 'object') {
        if (params.key) {
@@ -163,16 +193,21 @@
        else {
          key = $.labrats.getId() + params.name;
        }
+       keyValue = parseInt($.labrats.settings.hash(key));
        numGroups = params.numGroups || numGroups;
 
+       if (params.slices != null && params.slice != null) {
+         slices = params.slices;
+         slice  = params.slice;
+       }
        if (params.subset) {
          subset = params.subset;
-         controlValue =
-           $.labrats.settings.hash(key) % 100;
+         controlValue = keyValue % 100;
        }
      }
      else {
        key = $.labrats.key(arguments);
+       keyValue = parseInt($.labrats.settings.hash(key));
      }
 
      if (!key) {
@@ -183,9 +218,13 @@
      if (controlValue && controlValue > subset) {
        return -1;  // In the control group...
      }
-     else {
-       return $.labrats.settings.hash(key) % numGroups;
+
+     if ( (slices && keyValue % slices == slice) || !slices) {
+       return keyValue % numGroups;
      }
+     else {
+       return -1;   // Aren't part of the slice, then user is
+     }              // part of the control group.
    };
 
    /**
@@ -203,7 +242,8 @@
     *
     *   - `key` is the identification of the user
     *   - `name` is the test's name
-    *   - `subset` is the size of the pool, where `100 - subset` is the size of the control group
+    *   - `subset` is the size of the pool, where `100 - subset` is the
+    *      size of the control group
     *
     * This function can also be called as a series of parameters:
     *
