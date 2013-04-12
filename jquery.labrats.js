@@ -41,6 +41,9 @@
     * Will call the `control` function if the user is part of the 90%
     * control group, otherwise, it calls the appropriate function in
     * the `callbacks` array.
+    *
+    * (See the `group()` function for details as to the other acceptable values
+    * for named parameters)
     */
 
    $.labrats = function(params) {
@@ -136,6 +139,16 @@
     * This last approach allows you to specify the number of
     * groups (instead of calling the `configure()` function).
     *
+    * #### Accepted Parameters:
+    *
+    *  - `key` - The identification of the user account
+    *  - `name` - The name of the test. The name is appended to the key in order to compute the hash value. This guarantees that each test has a different distribution of user accounts.
+    *  - `numGroups` - The number of active groups a non-controlled test account can be in. If not given, this defaults to 0.
+    *  - `subset` - A percentage (from 0 to 100) that Specifies the size of the test pool. User accounts that hash outside this value are part of the control. If not specified, this defaults to `100` (meaning, no control group).
+    *  - `slices` - Divides the test pool into discreet slices where a user account can be in only one slice. This allows distinct test groups that don't overlap essentially guaranteeing that a user account could be in at most, one test group. The slices works for a given `name` parameter.
+    *  - `slice` - The name of the slice this user should belong in order to qualify for being part of a test group.
+    *  - `hash` - The function used to convert the *string* into a number than can be divided into the different test buckets.
+    *
     * #### Limit Test Pool with `subset`
     *
     * You can limit the size of available pool (effectively creating a
@@ -183,14 +196,19 @@
     */
 
    $.labrats.group = function(params) {
+     if (! params) {
+       params = {};
+     }
+
      var key, controlValue,
          numGroups = $.labrats.settings.numGroups,
          slices, slice, subset = 100,
-         keyValue;
+         keyValue,
+         hash = params.hash || $.labrats.settings.hash;
 
      if ($.isArray(params)) {
        key = $.labrats.key(params);
-       keyValue = parseInt($.labrats.settings.hash(key));
+       keyValue = parseInt(hash(key));
      }
      else if (typeof params === 'object') {
        if (params.key) {
@@ -199,7 +217,7 @@
        else {
          key = $.labrats.getId() + params.name;
        }
-       keyValue = parseInt($.labrats.settings.hash(key));
+       keyValue = parseInt(hash(key));
        numGroups = params.numGroups || numGroups;
 
        if (params.slices != null && params.slice != null) {
@@ -213,7 +231,7 @@
      }
      else {
        key = $.labrats.key(arguments);
-       keyValue = parseInt($.labrats.settings.hash(key));
+       keyValue = parseInt(hash(key));
      }
 
      if (!key) {

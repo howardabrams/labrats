@@ -111,13 +111,15 @@ test( "Group settings with named parameters and settings", function() {
 
 test( "Group settings outside a control group", function() {
     equal($.labrats.group( { key: id2, name: "Some Test",
-                             numGroups: 2, subset: 50 }), 1,
+                             numGroups: 2, subset: 50,
+                             hash: groupBhash}), 1,
           "Expected to be in the control group");
 });
 
 test( "Group settings within a control group", function() {
     equal($.labrats.group( { key: id1, name: "Another Test",
-                             numGroups: 2, subset: 50 }), -1,
+                             numGroups: 2, subset: 50,
+                             hash: controlled}), -1,
           "Expected to be in the control group");
 });
 
@@ -177,12 +179,14 @@ test("split test of a basic 50/50 test but only 10% pool", function() {
 
     equal(
       $.labrats({ key: id1, subset: 10, control: fn3,
+                  hash: controlled,
                   callbacks: [ fn1, fn2 ] }),
       "fn3", "Expected the control fn to be called.");
 
     equal(
       $.labrats({ key: id2, name: "Some Test", subset: 50,
-                    callbacks: [ fn1, fn2 ],       control: fn3 }),
+                  hash: groupBhash,
+                  callbacks: [ fn1, fn2 ], control: fn3 }),
       "fn2", "Expected fn2 to be called.");
 });
 
@@ -250,7 +254,6 @@ test("split test from a jQuery selector chain", function() {
       return this.html("fn1");
     };
     var fn2 = function() {
-      console.log("fn2", this);
       return this.html("fn2");
     };
 
@@ -309,4 +312,32 @@ function cookiesAllowed() {
   else {
     return true;
   }
+}
+
+/**
+ * This hashing function makes sure the result is always in the first
+ * group (group 0).
+ */
+
+function groupAhash(id) {
+  return 0;
+}
+
+/**
+ * This hashing function makes sure the result is always in the second
+ * group (group 1).
+ */
+
+function groupBhash(id) {
+  console.log("Key:", id);
+  return 1;
+}
+
+/**
+ * This hashing function makes sure the result is always in the control
+ * group (as it always returns -1).
+ */
+
+function controlled(id) { // We ignore the id parameter
+  return -1;
 }
