@@ -133,16 +133,7 @@ sign up button) and "New Logo" (which shows the "new" or "old"
 logo). Each test will involve all web site visitors split down the
 middle. This gives four possibilities:
 
-<table cellpadding="10" cellspacing="1" style="font-family:sans-serif">
-  <tr>
-  <th style="background:#800; color:white">Red Button<br/>and<br/>New Logo</th>
-  <th style="background:#008; color:white">Blue Button<br/>and<br/>New Logo</th>
-  </tr>
-  <tr>
-  <th style="background:#fcc">Red Button<br/>and<br/>Old Logo</th>
-  <th style="background:#ccf">Blue Button<br/>and<br/>Old Logo</th>
-  </tr>
-</table>
+![Overlapping Tests Illustration](visuals/overlapping-tests.png)
 
 The code to run these tests involves two calls to the plugin:
 
@@ -214,16 +205,7 @@ In this code, the `name` refers to the slice collection and the test
 is specified with the `slice` parameter. This divides our users into 4
 groups of 25% each:
 
-<table cellpadding="10" cellspacing="1" style="font-family:sans-serif">
-  <tr>
-  <th style="background:#800; color:white">Red Button</br>Group</th>
-  <th style="background:#008; color:white">Blue Button</br>Group</th>
-  </tr>
-  <tr>
-  <th style="background:#880; color:white">New Logo</br>Group</th>
-  <th style="background:#080; color:white">Old Logo</br>Group</th>
-  </tr>
-</table>
+![Discreet Tests Illustration](visuals/discreet-tests.png)
 
 **Note:** Some companies create this "major" slicing division with
   lots of small slices (like 20 slices of 5% each), and then allocate
