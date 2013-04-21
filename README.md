@@ -1,5 +1,5 @@
 This `lab-rats` project provides a [jQuery plugin][1] for doing
-*multi-variate testing* ([A/B Tests][2]) on the client's browser... or
+*multi-variate testing* ([A/B Tests][2]) on the client's browser...
 in other words, treating your customers like lab rats in order to
 engineer the best web application.
 
@@ -68,6 +68,10 @@ Now, we just need to change our functions a wee bit:
         });
     }
 
+Notice each function tracks if the button was shown *and* whether it
+was clicked. You really should track both to get a clear coorelation
+between the size of your test and its success.
+
 On Identifying Users
 -------------
 
@@ -86,15 +90,15 @@ You can pass in this value as a `key` to the `$.labrats()` function:
 large random number. It is NOT a GUID and may not be unique among all
 your users. Since it is internal to this plugin and meaningless, it is
 obviously not very  useful for tracking and reporting results. This is
-why we recommend you specifying your own ID key.
+why we recommend specifying your own ID key.
 
 On Hashing Issues
 -----------------
 
 The hashing algorithm that comes with this plugin is pretty... uh,
 simplistic. Actually, it is downright stupid, and the resulting
-distribution isn't great. However, the idea is that you can specify
-a hashing algorithm.
+distribution isn't great. However, you can specify a hashing
+algorithm.
 
 The function you give the `hash` must be able to accept a string
 and return an integer number, for instance:
@@ -114,32 +118,124 @@ It seems the [MurmurHash][4] is quite good at distribution, and
   [4]: http://en.wikipedia.org/wiki/MurmurHash
   [5]: dispersion/dispersion.html
 
-On Distribution for Multiple Tests
+
+
+Recipes and Examples
 ------------------
 
-Since this plugin distributes user accounts among test groups randomly,
-if you run more than one test, some user accounts will be in mutiple test groups.
-For example, the following experiment has assigns 25% of the users into "Group A" and 25% into "Group B".
-This leaves 50% of the users outside of this test in a control group:
+This section contains a series of contrived examples. Each assume that
+you've created some functions that *render the tests* for a user.
+
+### Two Parallel 50/50 Tests
+
+You want to run two tests, "Big Button" (shows either a red or blue
+sign up button) and "New Logo" (which shows the "new" or "old"
+logo). Each test will involve all web site visitors split down the
+middle. This gives four possibilities:
+
+<table cellpadding="10" cellspacing="1" style="font-family:sans-serif">
+  <tr>
+  <th style="background:#800; color:white">Red Button<br/>and<br/>New Logo</th>
+  <th style="background:#008; color:white">Blue Button<br/>and<br/>New Logo</th>
+  </tr>
+  <tr>
+  <th style="background:#fcc">Red Button<br/>and<br/>Old Logo</th>
+  <th style="background:#ccf">Blue Button<br/>and<br/>Old Logo</th>
+  </tr>
+</table>
+
+The code to run these tests involves two calls to the plugin:
+
+    $.labrats( { name: 'Big Button',
+                 callbacks: [ shinyRed, flashyBlue ] } );
+
+    $.labrats( { name: 'New Logo',
+                 callbacks: [ oldlogo, newlogo ] } );
+
+### Having a Control Group
+
+A *control group* contains the users who see the "old stuff". This is
+still a "group". For instance, in the previous example, the "control"
+is the group that see the old logo.
+
+However, if the logo is particularly daring, and you only wanted to
+show it to 10% of your users, you would use the `subset` option:
+
+    $.labrats( { name: 'New Logo', subset: 10,
+                 callbacks: [ newlogo ], control: oldlogo } );
+
+Note: The `callbacks` can accept one function (creating a single test
+group), but it still only accepts and array.
+
+The `control` parameter is optional. This could be useful if the old
+logo is already being displayed and the `newlogo()` function simply
+replaced it.
+
+### Having a Control plus Test Groups
+
+Suppose your graphics department churned up two hot new company logos
+you want to A/B test, but you still wanted the bulk of your users to
+see the old one until after the testing is complete.
+
+    $.labrats( { name: 'New Logo', subset: 50,
+                 callbacks: [ newlogoA, newlogoB ],
+                 control: oldlogo } );
+
+In the above code, 50% of the users will see the old logo (by calling
+the `oldlogo()` function). The remaining users are split, so 25% of
+your users will see the "A" logo version (by calling `newlogoA()`) and
+25% will see the "B" logo version (by calling `newlogoB()`).
+
+Keep in mind that since we are dealing with random numbers, 25% means
+*about* 25%. For instance, in some of the tests that we ran with 1,000
+user IDs, we got the following actual distribution:
 
 ![Distribution for Test 1](visuals/graph-1.png)
 
-Using the same users but with a *second experiment* of exactly the same size, some of the user accounts
-from the first "Group A" will be in this second "Group A" as well as some in "Group B", as shown in this
-image. The colors are based on the assignments in the first experiment above:
 
-![Distribution for Test 2](visuals/graph-2.png)
+### Multiple Non-Overlapping Tests
 
-If the second experiment should only use accounts from the first experiments *control group*, then this
-plugin is not what you should use, but instead, you'll need to create a distribution based on your
-knowledge of your user accounts.
+In our first recipe, we wanted to test both our sign up button (which
+could be red or blue) as well as our logo change. What if these tests
+were so major that you didn't want a customer to see either the red or
+blue buttons if they also saw the new logo?
+
+Here we introduce the concept of a *slice*. Each slice can contain a
+non-overlapping test... but only from tests in other slices. A slice
+*must* be named. Here is the example code:
+
+    $.labrats( { name: 'Major Tests', slices: 2, slice: 0,
+                 callbacks: [ shinyRed, flashyBlue ] } );
+
+    $.labrats( { name: 'Major Tests', slices: 2, slice: 1,
+                 callbacks: [ oldlogo, newlogo ] } );
+
+In this code, the `name` refers to the slice collection and the test
+is specified with the `slice` parameter. This divides our users into 4
+groups of 25% each:
+
+<table cellpadding="10" cellspacing="1" style="font-family:sans-serif">
+  <tr>
+  <th style="background:#800; color:white">Red Button</br>Group</th>
+  <th style="background:#008; color:white">Blue Button</br>Group</th>
+  </tr>
+  <tr>
+  <th style="background:#880; color:white">New Logo</br>Group</th>
+  <th style="background:#080; color:white">Old Logo</br>Group</th>
+  </tr>
+</table>
+
+**Note:** Some companies create this "major" slicing division with
+  lots of small slices (like 20 slices of 5% each), and then allocate
+  them to tests over time.
+  
 
 Function API
 ------------------
 
-The following details the available functions. While the primary
-function is `$.labrats()`, fine-grain control may be had with the
-other functions described below.
+This section details all available functions in this plugin. While the
+primary function is `$.labrats()`, fine-grain control may be had with
+the other functions described below.
 
 ### `$.labrats()`
 
@@ -151,13 +247,13 @@ or more callback functions (note that their order matters).
 For instance, for a test that splits the user accounts into three
 groups, you could do:
 
-    $.labrats.configure( { numGroups: 3 } ); // Optional
+    $.labrats.configure( { groups: 3 } ); // Optional
     $.labrats(userid, "Some Test", fn1, fn2, fn3);
 
 The other approach to calling this function is with named parameters.
 For instance, the same example could be written:
 
-    $.labrats({ key: userid, name: "Some Test", numGroups:3,
+    $.labrats({ key: userid, name: "Some Test", groups:3,
                 callbacks: [ fn1, fn2, fn3 ] });
 
 This function returns the results of calling one of the callback
@@ -174,6 +270,9 @@ group).  For instance:
 Will call the `control` function if the user is part of the 90%
 control group, otherwise, it calls the appropriate function in
 the `callbacks` array.
+
+(See the `group()` function for details as to the other acceptable values
+for named parameters)
 
 
 ### `$.fn.labrats()`
@@ -213,7 +312,7 @@ Or as a series of keys in an array. The following is equivalent:
 Or as a collection of named parameters:
 
     $.labrats.group( { key: userID, name: "Large Logo Test",
-                       numGroups: 2 } );
+                       groups: 2 } );
 
 This last approach allows you to specify the number of
 groups (instead of calling the `configure()` function).
@@ -222,7 +321,7 @@ groups (instead of calling the `configure()` function).
 
  - `key` - The identification of the user account
  - `name` - The name of the test. The name is appended to the key in order to compute the hash value. This guarantees that each test has a different distribution of user accounts.
- - `numGroups` - The number of active groups a non-controlled test account can be in. If not given, this defaults to 0.
+ - `groups` - The number of active groups a non-controlled test account can be in. If not given, this defaults to 0.
  - `subset` - A percentage (from 0 to 100) that Specifies the size of the test pool. User accounts that hash outside this value are part of the control. If not specified, this defaults to `100` (meaning, no control group).
  - `slices` - Divides the test pool into discreet slices where a user account can be in only one slice. This allows distinct test groups that don't overlap essentially guaranteeing that a user account could be in at most, one test group. The slices works for a given `name` parameter.
  - `slice` - The name of the slice this user should belong in order to qualify for being part of a test group.
@@ -235,7 +334,7 @@ a pool of people in test groups and another *control group*).  For
 instance:
 
     $.labrats.group( { key: userId, name: "Another Test",
-                       numGroups: 2, subset: 10 });
+                       groups: 2, subset: 10 });
 
 Will return `-1` if the user is part of the 90% control group,
 otherwise, it returns either `0` or `1` if it is in one of the
@@ -253,18 +352,18 @@ For instance, suppose you have some experiments that are quite invasive,
 we could define the first experiment to use the first slice:
 
     $.labrats.group( { key: userId, name: "serious tests",
-                       slices: 3, slice: 0, numGroups: 2 });
+                       slices: 3, slice: 0, groups: 2 });
 
 The second experiment would use the next *slice*:
 
     $.labrats.group( { key: userId, name: "serious tests",
-                       slices: 3, slice: 1, numGroups: 2 });
+                       slices: 3, slice: 1, groups: 2 });
 
 Notice the test name for the group of slices must be the same.
 
 This slicing feature can be combined with the `subset` feature to
 keep a control group out. Also, when using the subset and the slicing
-features, the `numGroups` option can be unspecified in order to default
+features, the `groups` option can be unspecified in order to default
 to `1` (a single test group).
 
 With five experiments where each experiment is in a slice with
@@ -329,6 +428,6 @@ This function allows a single object to overwrite some, but not
 all configuration values. Acceptable values include:
 
  - `hash`: A function used to convert a user ID key and test name into a number
- - `numGroups`: The number of test groups to divide the user pool
+ - `groups`: The number of test groups to divide the user pool
 
 

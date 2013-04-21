@@ -38,24 +38,24 @@ function experiment4() {
  *
  *   - name: The number of the experiment, 1, 2, 3, etc.
  *   - size: The size of the sample size, e.g. 10000
- *   - numGroups: The number of test buckets to split the sample, e.g. 2
+ *   - groups: The number of test buckets to split the sample, e.g. 2
  *                for a 50/50 test
  */
 
-function exp_helper( name, size, numGroups ) {
+function exp_helper( name, size, groups ) {
   var i, j, k, results = [];
 
   // Begin by initializing the results array, and creating a "graph"
   // for each group.
 
   var el = $('#experiment'+name);
-  for (k = 0; k < numGroups; k++) {
+  for (k = 0; k < groups; k++) {
     results[k] = 0;
     el.append('<div class="label">Group ' + k + '</div>',
               '<div class="group' + k + ' results"></div>');
   }
 
-  $.labrats.configure( { numGroups: numGroups } );
+  $.labrats.configure( { groups: groups } );
 
   // Step through the same size, creating an ID, and incrementing
   // the count for the group the ID belongs.
@@ -67,7 +67,7 @@ function exp_helper( name, size, numGroups ) {
   }
 
   // For each "graph" we put the number and the set the CSS width
-  for (j = 0; j < numGroups; j++) {
+  for (j = 0; j < groups; j++) {
     $("#experiment" + name + " .group" + j).html(results[j]).css("width", results[j]);
   }
   console.log("Experiment " + name + " Results:", results);

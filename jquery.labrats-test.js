@@ -56,7 +56,7 @@ test( "Default Hash Function", function() {
  */
 
 test( "Basic two group selection", function() {
-  $.labrats.configure( { numGroups: 2 } );
+  $.labrats.configure( { groups: 2 } );
 
   switch ($.labrats.group(id2)) {
     case 0:
@@ -69,7 +69,7 @@ test( "Basic two group selection", function() {
 });
 
 test( "Two groups with Test Names", function() {
-  $.labrats.configure( { numGroups: 2 } );
+  $.labrats.configure( { groups: 2 } );
 
   switch ($.labrats.group("Some Test", id1)) {
     case 0:
@@ -82,7 +82,7 @@ test( "Two groups with Test Names", function() {
 });
 
 test( "Two groups with Test Names passed as arrays", function() {
-  $.labrats.configure( { numGroups: 2 } );
+  $.labrats.configure( { groups: 2 } );
 
   switch ($.labrats.group(["Some Test", id1])) {
     case 0:
@@ -97,13 +97,13 @@ test( "Two groups with Test Names passed as arrays", function() {
 test( "Group settings passed as named parameters", function() {
 
     equal($.labrats.group( { name: "Some Test", key: id1,
-                             numGroups: 2}),
+                             groups: 2}),
           1,  /* Expectation */
           "Expected to be in second group");
 });
 
 test( "Group settings with named parameters and settings", function() {
-    $.labrats.configure( { numGroups: 10 } );
+    $.labrats.configure( { groups: 10 } );
 
     equal($.labrats.group( { name: "Some Test", key: id1 }), 5,
           "Expected to be in sixth (5) group");
@@ -111,14 +111,14 @@ test( "Group settings with named parameters and settings", function() {
 
 test( "Group settings outside a control group", function() {
     equal($.labrats.group( { key: id2, name: "Some Test",
-                             numGroups: 2, subset: 50,
+                             groups: 2, subset: 50,
                              hash: groupBhash}), 1,
           "Expected to be in the control group");
 });
 
 test( "Group settings within a control group", function() {
     equal($.labrats.group( { key: id1, name: "Another Test",
-                             numGroups: 2, subset: 50,
+                             groups: 2, subset: 50,
                              hash: controlled}), -1,
           "Expected to be in the control group");
 });
@@ -129,15 +129,15 @@ test( "Group settings within a control group", function() {
 
 test( "inGroup with named parameters", function() {
 
-  ok( $.labrats.inGroup(1, {key: id2, numGroups: 2}),
+  ok( $.labrats.inGroup(1, {key: id2, groups: 2}),
       "Expected to be in second group");
   ok( $.labrats.inGroup(1, {key: id2, name: 'Some Test',
-                            numGroups: 2}),
+                            groups: 2}),
       "Expected to be in second group");
 });
 
 test( "inGroup with ordered parameters", function() {
-  $.labrats.configure( { numGroups: 2 } );
+  $.labrats.configure( { groups: 2 } );
   ok( $.labrats.inGroup(1, id2), "Expected to be in second group");
 });
 
@@ -155,12 +155,12 @@ test("split test of a basic 50/50 test", function() {
     };
 
     equal(
-        $.labrats({ key: id1, numGroups: 2,
+        $.labrats({ key: id1, groups: 2,
                           callbacks: [ f1, f2 ] }),
         "f2", "Expected f2 to be called.");
 
     equal(
-        $.labrats({ key: id2, name: "Some Test", numGroups:2,
+        $.labrats({ key: id2, name: "Some Test", groups:2,
                           callbacks: [ f1, f2 ] }),
         "f2", "Expected f2 to be called.");
 });
@@ -192,7 +192,7 @@ test("split test of a basic 50/50 test but only 10% pool", function() {
 
 test("split test of a basic 50/50 test using ordered parameters", function() {
 
-    $.labrats.configure( { numGroups: 3 } );
+    $.labrats.configure( { groups: 3 } );
 
     var f1 = function() {
         return "f1";
@@ -211,9 +211,9 @@ test("split test of a basic 50/50 test using ordered parameters", function() {
           "f3", "Expected f3 to be called.");
 });
 
-test("split test without specifying numGroups", function() {
+test("split test without specifying groups", function() {
     // Clear out any numGroup setting
-    delete($.labrats.settings.numGroups);
+    delete($.labrats.settings.groups);
 
     var f1 = function() {
         return "f1";
@@ -233,9 +233,9 @@ test("split test without specifying numGroups", function() {
 });
 
 
-test("split test with unmatched callbacks and numGroups", function() {
+test("split test with unmatched callbacks and groups", function() {
     // Set the number of groups to an incorrect number
-    $.labrats.configure( { numGroups: 30 } );
+    $.labrats.configure( { groups: 30 } );
 
     var f1 = function() {
         return "f1";
@@ -257,7 +257,7 @@ test("split test from a jQuery selector chain", function() {
       return this.html("fn2");
     };
 
-    var params = { key: id1, numGroups: 2,
+    var params = { key: id1, groups: 2,
                    callbacks: [ fn1, fn2 ] };
     var element = $("#split-test-1").labrats(params).html();
 
@@ -287,15 +287,15 @@ test("getID should return the same value repeatedly.", function() {
 
 test("group should use a default key if one isn't given", function() {
     if (cookiesAllowed()) {
-      var group = $.labrats.group( { numGroups:2 } );
-      equal($.labrats.group( { numGroups:2 } ), group,
+      var group = $.labrats.group( { groups:2 } );
+      equal($.labrats.group( { groups:2 } ), group,
           "Expected to be in sixth (5) group");
     }
 });
 
 test("group given no parameters should still work", function() {
   if (cookiesAllowed()) {
-    $.labrats.configure( { numGroups:3 } );
+    $.labrats.configure( { groups:3 } );
     var group = $.labrats.group();
     equal($.labrats.group(), group,
           "Expected to be in sixth (5) group");

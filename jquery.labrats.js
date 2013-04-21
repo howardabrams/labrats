@@ -18,13 +18,13 @@
     * For instance, for a test that splits the user accounts into three
     * groups, you could do:
     *
-    *     $.labrats.configure( { numGroups: 3 } ); // Optional
+    *     $.labrats.configure( { groups: 3 } ); // Optional
     *     $.labrats(userid, "Some Test", fn1, fn2, fn3);
     *
     * The other approach to calling this function is with named parameters.
     * For instance, the same example could be written:
     *
-    *     $.labrats({ key: userid, name: "Some Test", numGroups:3,
+    *     $.labrats({ key: userid, name: "Some Test", groups:3,
     *                 callbacks: [ fn1, fn2, fn3 ] });
     *
     * This function returns the results of calling one of the callback
@@ -48,16 +48,16 @@
 
    $.labrats = function(params) {
      // Save off the original numgroups setting...
-     var origNumGroups = $.labrats.settings.numGroups;
+     var origNumGroups = $.labrats.settings.groups;
 
      if (typeof params === 'object') {
        // The number of groups should be the number of callbacks
-       $.labrats.settings.numGroups = params.callbacks.length;
+       $.labrats.settings.groups = params.callbacks.length;
 
        // Use the new numGroup setting:
        var groupnum = $.labrats.group(params);
 
-       $.labrats.settings.numGroups = origNumGroups;
+       $.labrats.settings.groups = origNumGroups;
 
        if (groupnum == -1) {    // User is part of the control group
          return params.control.apply(this, [groupnum]);
@@ -80,11 +80,11 @@
        }
 
        // The number of groups should be the number of callbacks
-       $.labrats.settings.numGroups = funcs.length;
+       $.labrats.settings.groups = funcs.length;
 
        var groupnum = $.labrats.group(keys);
 
-       $.labrats.settings.numGroups = origNumGroups;
+       $.labrats.settings.groups = origNumGroups;
 
        if (funcs[groupnum]) {
          return funcs[groupnum].apply(this, [groupnum]);
@@ -134,7 +134,7 @@
     * Or as a collection of named parameters:
     *
     *     $.labrats.group( { key: userID, name: "Large Logo Test",
-    *                        numGroups: 2 } );
+    *                        groups: 2 } );
     *
     * This last approach allows you to specify the number of
     * groups (instead of calling the `configure()` function).
@@ -143,7 +143,7 @@
     *
     *  - `key` - The identification of the user account
     *  - `name` - The name of the test. The name is appended to the key in order to compute the hash value. This guarantees that each test has a different distribution of user accounts.
-    *  - `numGroups` - The number of active groups a non-controlled test account can be in. If not given, this defaults to 0.
+    *  - `groups` - The number of active groups a non-controlled test account can be in. If not given, this defaults to 0.
     *  - `subset` - A percentage (from 0 to 100) that Specifies the size of the test pool. User accounts that hash outside this value are part of the control. If not specified, this defaults to `100` (meaning, no control group).
     *  - `slices` - Divides the test pool into discreet slices where a user account can be in only one slice. This allows distinct test groups that don't overlap essentially guaranteeing that a user account could be in at most, one test group. The slices works for a given `name` parameter.
     *  - `slice` - The name of the slice this user should belong in order to qualify for being part of a test group.
@@ -156,7 +156,7 @@
     * instance:
     *
     *     $.labrats.group( { key: userId, name: "Another Test",
-    *                        numGroups: 2, subset: 10 });
+    *                        groups: 2, subset: 10 });
     *
     * Will return `-1` if the user is part of the 90% control group,
     * otherwise, it returns either `0` or `1` if it is in one of the
@@ -174,18 +174,18 @@
     * we could define the first experiment to use the first slice:
     *
     *     $.labrats.group( { key: userId, name: "serious tests",
-    *                        slices: 3, slice: 0, numGroups: 2 });
+    *                        slices: 3, slice: 0, groups: 2 });
     *
     * The second experiment would use the next *slice*:
     *
     *     $.labrats.group( { key: userId, name: "serious tests",
-    *                        slices: 3, slice: 1, numGroups: 2 });
+    *                        slices: 3, slice: 1, groups: 2 });
     *
     * Notice the test name for the group of slices must be the same.
     *
     * This slicing feature can be combined with the `subset` feature to
     * keep a control group out. Also, when using the subset and the slicing
-    * features, the `numGroups` option can be unspecified in order to default
+    * features, the `groups` option can be unspecified in order to default
     * to `1` (a single test group).
     *
     * With five experiments where each experiment is in a slice with
@@ -201,7 +201,7 @@
      }
 
      var key, controlValue,
-         numGroups = $.labrats.settings.numGroups,
+         groups = $.labrats.settings.groups,
          slices, slice, subset = 100,
          keyValue,
          hash = params.hash || $.labrats.settings.hash;
@@ -218,7 +218,7 @@
          key = $.labrats.getId() + params.name;
        }
        keyValue = parseInt(hash(key));
-       numGroups = params.numGroups || numGroups;
+       groups = params.groups || groups;
 
        if (params.slices != null && params.slice != null) {
          slices = params.slices;
@@ -244,7 +244,7 @@
      }
 
      if ( (slices && keyValue % slices == slice) || !slices) {
-       return keyValue % numGroups;
+       return keyValue % groups;
      }
      else {
        return -1;   // Aren't part of the slice, then user is
@@ -392,7 +392,7 @@
     * all configuration values. Acceptable values include:
     *
     *  - `hash`: A function used to convert a user ID key and test name into a number
-    *  - `numGroups`: The number of test groups to divide the user pool
+    *  - `groups`: The number of test groups to divide the user pool
     */
 
    $.labrats.configure = function(config) {
