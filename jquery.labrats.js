@@ -18,7 +18,6 @@
     * For instance, for a test that splits the user accounts into three
     * groups, you could do:
     *
-    *     $.labrats.configure( { groups: 3 } ); // Optional
     *     $.labrats(userid, "Some Test", fn1, fn2, fn3);
     *
     * The other approach to calling this function is with named parameters.
@@ -30,13 +29,19 @@
     * This function returns the results of calling one of the callback
     * functions.
     *
+    * The callback function is passed two parameters:
+    * 
+    *   - `key` referring to the user's ID
+    *   - `group` the group number with 0 being the first group, and
+    *             -1 meaning this user is part of the control group.
+    *
     * Note: The size of available pool for tests can be limited (effectively
     * creating a a pool of people in test groups and another control
     * group).  For instance:
     *
-    *    $.labrats.group( { key: userId, name: "Another Test", subset: 10,
-    *                       callbacks: [ fn1, fn2, fn3 ],
-    *                       control: fn4 });
+    *    $.labrats({ key: userId, name: "Another Test", subset: 10,
+    *                callbacks: [ fn1, fn2, fn3 ],
+    *                control: fn4 });
     *
     * Will call the `control` function if the user is part of the 90%
     * control group, otherwise, it calls the appropriate function in
@@ -59,11 +64,16 @@
 
        $.labrats.settings.groups = origNumGroups;
 
+       var id = params.key;
+       if (! id) {
+         id = $.labrats.getId();
+       }
+
        if (groupnum == -1) {    // User is part of the control group
-         return params.control.apply(this, [groupnum]);
+         return params.control.apply(this, [id, groupnum]);
        }
        else {
-         return params.callbacks[groupnum].apply(this, [groupnum]);
+         return params.callbacks[groupnum].apply(this, [id, groupnum]);
        }
      }
      else {
@@ -87,7 +97,7 @@
        $.labrats.settings.groups = origNumGroups;
 
        if (funcs[groupnum]) {
-         return funcs[groupnum].apply(this, [groupnum]);
+         return funcs[groupnum].apply(this, [keys[0], groupnum]);
        }
        else {
          throw("No callback function given for group number: "+groupnum);
