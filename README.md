@@ -118,8 +118,6 @@ It seems the [MurmurHash][4] is quite good at distribution, and
   [4]: http://en.wikipedia.org/wiki/MurmurHash
   [5]: dispersion/dispersion.html
 
-
-
 Recipes and Examples
 ------------------
 

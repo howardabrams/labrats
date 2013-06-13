@@ -390,7 +390,7 @@
      hash: function(key) {
        var results = 0;
        for(c in key) {
-         results += ( key.charCodeAt(c) << c);
+         results += key.charCodeAt(c);
        }
        // console.log("Key:", key, "Hash:", results);
        return Math.abs(results);

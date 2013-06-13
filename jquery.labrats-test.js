@@ -44,11 +44,11 @@ test("Make a key from a functions' arguments", function() {
  */
 
 test( "Default Hash Function", function() {
-  equal( $.labrats.settings.hash('A'),   65,        "ASCII A, eh?!" );
-  equal( $.labrats.settings.hash('abc'), 689,       "Passed!" );
-  equal( $.labrats.settings.hash(id2),   358197635, "What about a GUID?" );
-  equal( $.labrats.settings.hash(''),    0,         "Empty strings hash to 0" );
-  equal( $.labrats.settings.hash(345),   0,         "Numbers don't have a hash" );
+  equal( $.labrats.settings.hash('A'),   65,   "ASCII A, eh?!" );
+  equal( $.labrats.settings.hash('abc'), 294,  "Passed!" );
+  equal( $.labrats.settings.hash(id2),   2507, "What about a GUID?" );
+  equal( $.labrats.settings.hash(''),    0,    "Empty strings hash to 0" );
+  equal( $.labrats.settings.hash(345),   0,    "Numbers don't have a hash" );
 });
 
 /**
@@ -73,10 +73,10 @@ test( "Two groups with Test Names", function() {
 
   switch ($.labrats.group("Some Test", id1)) {
     case 0:
-      ok(true, "Part of first group.");
+      ok(true, "Expected to be in second group.");
       break;
     case 1:
-      ok(false, "Expected to be in first group.");
+      ok(true, "Part of the second group.");
       break;
     }
 });
@@ -86,10 +86,10 @@ test( "Two groups with Test Names passed as arrays", function() {
 
   switch ($.labrats.group(["Some Test", id1])) {
     case 0:
-      ok(true, "Part of first group.");
+      ok(true, "Expected to be in second group.");
       break;
     case 1:
-      ok(false, "Expected to be in first group.");
+      ok(true, "Part of the second group.");
       break;
     }
 });
@@ -105,8 +105,8 @@ test( "Group settings passed as named parameters", function() {
 test( "Group settings with named parameters and settings", function() {
     $.labrats.configure( { groups: 10 } );
 
-    equal($.labrats.group( { name: "Some Test", key: id1 }), 5,
-          "Expected to be in sixth (5) group");
+    equal($.labrats.group( { name: "Some Test", key: id1 }), 3,
+          "Expected to be in fourth (3) group");
 });
 
 test( "Group settings outside a control group", function() {
@@ -165,6 +165,20 @@ test("split test of a basic 50/50 test", function() {
         "f2", "Expected f2 to be called.");
 });
 
+test("see if callbacks get the correct key", function() {
+  
+    var callback = function(id, groupnum) {
+        return "f" + (groupnum+1) + "-" + id;
+    };
+
+    equal(
+        $.labrats({ key: id1,
+                    callbacks: [ callback, callback ] }),
+        "f2-"+id1, "Expected f2 and id to be called.");
+
+});
+
+
 test("split test of a basic 50/50 test but only 10% pool", function() {
 
     var fn1 = function() {
@@ -205,7 +219,7 @@ test("split test of a basic 50/50 test using ordered parameters", function() {
     };
 
     equal($.labrats(id1, f1, f2, f3),
-          "f2", "Expected f2 to be called.");
+          "f1", "Expected f1 to be called.");
 
     equal($.labrats(id2, "Some Test", f1, f2, f3),
           "f3", "Expected f3 to be called.");
@@ -226,7 +240,7 @@ test("split test without specifying groups", function() {
     };
 
     equal($.labrats(id1, f1, f2, f3),
-          "f2", "Expected f2 to be called.");
+          "f1", "Expected f1 to be called.");
 
     equal($.labrats(id2, "Some Test", f1, f2, f3),
           "f3", "Expected f3 to be called.");
@@ -301,7 +315,6 @@ test("group given no parameters should still work", function() {
           "Expected to be in sixth (5) group");
   }
 });
-
 
 function cookiesAllowed() {
   document.cookie = "foo=bar";
